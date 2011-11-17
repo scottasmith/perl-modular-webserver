@@ -1,0 +1,84 @@
+# Copyright (C) <2011>  <Scott Smith> <smitherz82@gmail.com>
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	
+my %module_duplicates_header = (
+	module_name => 'duplicates',
+	page_link => 'duplicates',
+	page_link_title => 'Duplicates',
+	page_routine => \&duplicates_routine,
+	rank => 2
+);
+
+sub duplicates
+{
+	return %module_duplicates_header;
+}
+
+sub duplicates_routine
+{
+	my %response;
+
+	$response{status} = "200";
+	$response{title} = "Duplicate Users";
+	$response{body} = duplicates_getbody();
+
+	return %response;
+}
+
+sub duplicates_getbody
+{
+	my ($i, $j, $who, @who_lines, $num_users, @who_columns, @tmp_array, $ret_str);
+	$num_users = 0;
+
+	# Get the system users logged in and convert into line array
+	$who = `who -u 2>&1 | sort`;
+	@who_lines = split("\n", $who);
+
+	my %tmp = (name => '', count => 0);
+	unshift( @tmp_array, \%tmp );
+
+	# Loop through the who lines
+	for( $i = 0; $i < @who_lines; $i++ ) {
+		@who_columns = split(" ", $who_lines[$i]);
+
+		my $arr_id = name_in_array( $who_columns[0], @tmp_array );
+
+		if( $arr_id > -1 ) {
+			$tmp_array[ $arr_id ]{count}++;
+		} else {
+			my %tmp = (name => $who_columns[0], count => 1);
+			unshift( @tmp_array, \%tmp );
+		}
+
+		$num_users++;
+	}
+
+	# Print the users if there are more than one instance
+
+	$ret_str.= "<p><b>Total number of users in the system: $num_users</b></p>\n<hr />\n";
+
+	for( $i = 0; $i < @tmp_array; $i++ ) {
+		if( $tmp_array[$i]{name} ne '' && $tmp_array[$i]{count} > 1 ) {
+			$ret_str.= "> " . $tmp_array[$i]{name} . " (sessions: " . $tmp_array[$i]{count} . ")<br />\n";
+		}
+	}
+
+	$ret_str.= "</pre>\n\n";
+
+	$ret_str;
+}
+
+1;
+

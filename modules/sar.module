@@ -1,0 +1,49 @@
+# Copyright (C) <2011>  <Scott Smith> <smitherz82@gmail.com>
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+my %module_sar_header = (
+	module_name => 'sar',
+	page_link => 'sar',
+	page_link_title => 'Sar',
+	page_routine => \&sar_routine,
+	rank => 4
+);
+
+sub sar
+{
+	return %module_sar_header;
+}
+
+sub sar_routine
+{
+	my %request = @_;
+	my %response;
+
+	$response{status} = "200";
+	$response{title} = "Sar";
+	$response{body} = sar_getbody();
+
+	return %response;
+}
+
+sub sar_getbody
+{
+	my $sar_contents = `sar 1 10 2>&1`;
+
+	$ret_str = '<pre>' . $sar_contents . '</pre>';
+}
+
+1;
+

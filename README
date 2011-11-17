@@ -1,0 +1,53 @@
+
+Perl Modular Webserver written in Perl
+====================================================================
+
+This program was made solely to ease the simple tasks on a Sco box.
+
+There are no warranties that this will work 100% and i can not be held
+responsible for any loss by the use of this program.
+
+There are three modules in the 'modules' folder, these are simply to output
+data from the command line to the browser.
+The duplicates module simply calls 'who -u' (a Sco/nix command) and looks
+through all the users to see who is in there more than once.
+
+The server has MIME support and can retrieve any HTML/Javscript/CSS
+file from the public directory as a normal file and it will return the correct
+Content-type to the browser.
+More MIME types can be added to the lib/misc.pl file.
+
+The project also has support for HTTP authentication, much like the .htaccess/.htpasswd
+in Apache. This can be used anywhere in the project as follows: -
+
+if( authorized('user', 'pass') == 1 ) {
+	print 'Authorised';
+}
+else {
+	push @{$request{DATA}{RESPONSE_HEADERS}}, { 'WWW-Authenticate' => 'Basic realm="Authentication Needed to use Clear Lock"' };
+	$response{title} = "Clear Locks";
+	$response{body} = 'Access Denied';
+	$response{status} = "401";
+	return %response;
+}
+
+Again, much more work could be put into this to make it better.
+
+Lots more can be done with this project to improve it but it was a small project
+so we didn't have to keep logging into ssh to do basic things on a busy server.
+
+Folders
+------------------
+modules/
+	You can place any module in here, they have function names that match the filename
+data/
+	Any private data, such as 'authed_users.txt'
+lib/
+	Library files
+public/
+	Everything in here is public to the browser to download
+
+	
+The server must be run by the following command: -
+
+perl webserver.pl <portno>
